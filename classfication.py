@@ -339,8 +339,8 @@ if __name__ == "__main__":
     try:
         # please modify to your actual path
         organizer = AcademicPaperOrganizer(
-            source_dir=r"C:\\Users\\小耳東同学\\Desktop\\test1\\articles",  # modify to your actual PDF folder path
-            output_dir=r"C:\\Users\\小耳東同学\\Desktop\\test1\\class"  # modify to your actual output path
+            source_dir=r"articles",  # modify to your actual PDF folder path
+            output_dir=r"classified_papers"  # modify to your actual output path
         )
         organizer.organize_papers()
     except Exception as e:
