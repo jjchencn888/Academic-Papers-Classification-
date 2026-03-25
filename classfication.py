@@ -63,7 +63,6 @@ class AcademicPaperOrganizer:
         patterns = [
             r'Abstract[:\s]+(.*?)(?=\n\n|\n[A-Z]|\n\n[A-Z])',
             r'ABSTRACT[:\s]+(.*?)(?=\n\n|\n[A-Z]|\n\n[A-Z])',
-            r'摘要[:\s]+(.*?)(?=\n\n)',
             r'\[Abstract\][:\s]+(.*?)(?=\n\n)'
         ]
         
@@ -81,7 +80,6 @@ class AcademicPaperOrganizer:
         kw_patterns = [
             r'Keywords?[:\s]+(.*?)(?=\n\n|\n[A-Z])',
             r'KEYWORDS[:\s]+(.*?)(?=\n\n|\n[A-Z])',
-            r'关键词[:\s]+(.*?)(?=\n\n)'
         ]
         
         for pattern in kw_patterns:
