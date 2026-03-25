@@ -8,4 +8,4 @@ Updates maybe in the future? :)
 
 ## How to use?
 
-
+Put all articles in a same document, set the "source_dir" and "output_dir". The program will read the source_dir and output the processing results to output_dir.
