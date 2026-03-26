@@ -8,22 +8,52 @@ from collections import Counter
 import re
 import numpy as np
 
+# OCR support
+try:
+    import pytesseract
+    from pdf2image import convert_from_path
+    OCR_AVAILABLE = True
+except ImportError:
+    OCR_AVAILABLE = False
+    print("Warning: pytesseract or pdf2image not installed. OCR support disabled.")
+    print("Install with: pip install pytesseract pdf2image")
+    print("Also need to install Tesseract OCR: https://github.com/tesseract-ocr/tesseract")
+
 class AcademicPaperOrganizer:
     """academic paper classification"""
     
-    def __init__(self, source_dir, output_dir=None):
+    def __init__(self, source_dir, output_dir=None, enable_ocr=True):
         self.source_dir = Path(source_dir)
         if output_dir is None:
             self.output_dir = self.source_dir / "classified_papers"
         else:
             self.output_dir = Path(output_dir)
-        
+
         self.papers = []
         self.paper_features = []
-        
+        self.enable_ocr = enable_ocr and OCR_AVAILABLE
+
         if not self.source_dir.exists():
             raise ValueError(f"source directory does not exist: {self.source_dir}")
     
+    def extract_text_with_ocr(self, pdf_path, max_pages=5):
+        """use OCR to extract text from scanned PDF"""
+        if not self.enable_ocr:
+            return ''
+
+        try:
+            print(f"  attempting OCR extraction for: {pdf_path.name}")
+            images = convert_from_path(pdf_path, first_page=1, last_page=max_pages)
+            full_text = ''
+            for i, image in enumerate(images):
+                text = pytesseract.image_to_string(image)
+                if text:
+                    full_text += f"\n{text}"
+            return full_text.strip()
+        except Exception as e:
+            print(f"  OCR extraction failed: {e}")
+            return ''
+
     def extract_paper_metadata(self, pdf_path):
         """extract paper metadata"""
         metadata = {
@@ -44,9 +74,12 @@ class AcademicPaperOrganizer:
                         full_text += f"\n{text}"
                 
                 if not full_text.strip():
-                    print(f"warning: {pdf_path.name} cannot extract text content")
-                    return metadata
-                
+                    print(f"  pdfplumber cannot extract text, trying OCR...")
+                    full_text = self.extract_text_with_ocr(pdf_path)
+                    if not full_text.strip():
+                        print(f"  warning: {pdf_path.name} cannot extract text content (both pdfplumber and OCR failed)")
+                        return metadata
+
                 metadata['text'] = full_text
                 
                 metadata['abstract'] = self.extract_abstract(full_text)
